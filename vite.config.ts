@@ -1,7 +1,7 @@
 import babel from '@rolldown/plugin-babel';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [
@@ -18,5 +18,9 @@ export default defineConfig({
       '@entities': fileURLToPath(new URL('./src/entities', import.meta.url)),
       '@shared': fileURLToPath(new URL('./src/shared', import.meta.url)),
     },
+  },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
   },
 });
