@@ -1,5 +1,11 @@
 import { request } from './request';
-import type { CheckAccountRequest, CheckAccountResponse, GreenApiCredentials } from './types';
+import type {
+  CheckAccountRequest,
+  CheckAccountResponse,
+  GreenApiCredentials,
+  SendMessageRequest,
+  SendMessageResponse,
+} from './types';
 
 const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredentials) => {
   const checkAccount = ({ phoneNumber }: CheckAccountRequest) =>
@@ -11,8 +17,19 @@ const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredenti
       },
     });
 
+  const sendMessage = ({ chatId, message }: SendMessageRequest) =>
+    request<SendMessageResponse>({
+      method: 'POST',
+      url: `/waInstance${idInstance}/sendMessage/${apiTokenInstance}`,
+      data: {
+        chatId,
+        message,
+      },
+    });
+
   return {
     checkAccount,
+    sendMessage,
   };
 };
 
