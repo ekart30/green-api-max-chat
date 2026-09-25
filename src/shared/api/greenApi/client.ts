@@ -2,7 +2,9 @@ import { request } from './request';
 import type {
   CheckAccountRequest,
   CheckAccountResponse,
+  DeleteNotificationResponse,
   GreenApiCredentials,
+  ReceiveNotificationResponse,
   SendMessageRequest,
   SendMessageResponse,
 } from './types';
@@ -27,9 +29,23 @@ const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredenti
       },
     });
 
+  const receiveNotification = () =>
+    request<ReceiveNotificationResponse>({
+      method: 'GET',
+      url: `/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`,
+    });
+
+  const deleteNotification = (receiptId: number) =>
+    request<DeleteNotificationResponse>({
+      method: 'DELETE',
+      url: `/waInstance${idInstance}/deleteNotification/${apiTokenInstance}/${receiptId}`,
+    });
+
   return {
     checkAccount,
     sendMessage,
+    receiveNotification,
+    deleteNotification,
   };
 };
 
