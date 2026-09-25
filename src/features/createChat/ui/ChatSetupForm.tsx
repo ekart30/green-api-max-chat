@@ -2,15 +2,16 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
-import type { CheckAccountResponse } from '@shared/api/greenApi/types';
+import { useSessionStore } from '@entities/session/model/sessionStore';
 
 import { createChat } from '../api/createChat';
 import { createChatSchema, type CreateChatFormValues } from '../model/schema';
 import { ErrorMessage, Field, Form, Input, SubmitButton } from './ChatSetupForm.styles';
 
 const ChatSetupForm = () => {
-  const [response, setResponse] = useState<CheckAccountResponse | null>(null);
+  const [isAccountNotFound, setIsAccountNotFound] = useState(false);
   const [hasRequestError, setHasRequestError] = useState(false);
+  const setSession = useSessionStore((state) => state.setSession);
 
   const {
     register,
@@ -21,13 +22,24 @@ const ChatSetupForm = () => {
   });
 
   const onSubmit: SubmitHandler<CreateChatFormValues> = async (values) => {
-    setResponse(null);
+    setIsAccountNotFound(false);
     setHasRequestError(false);
 
     try {
       const result = await createChat(values);
 
-      setResponse(result);
+      if (!result.exist) {
+        setIsAccountNotFound(true);
+
+        return;
+      }
+
+      setSession({
+        idInstance: values.idInstance,
+        apiTokenInstance: values.apiTokenInstance,
+        chatId: result.chatId,
+        phoneNumber: values.phoneNumber,
+      });
     } catch {
       setHasRequestError(true);
     }
@@ -67,13 +79,7 @@ const ChatSetupForm = () => {
         {isSubmitting ? 'Проверка...' : 'Создать чат'}
       </SubmitButton>
 
-      {response && (
-        <span>
-          {response.exist
-            ? `Чат найден. chatId: ${response.chatId}`
-            : 'Аккаунт MAX с таким номером не найден'}
-        </span>
-      )}
+      {isAccountNotFound && <span>Аккаунт MAX с таким номером не найден</span>}
 
       {hasRequestError && <ErrorMessage>Не удалось выполнить запрос</ErrorMessage>}
     </Form>
