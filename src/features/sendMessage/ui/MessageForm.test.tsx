@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useMessageStore } from '@entities/message/model/messageStore';
 import { useSessionStore } from '@entities/session/model/sessionStore';
 
 import { sendMessage } from '../api/sendMessage';
@@ -20,7 +21,7 @@ describe('MessageForm', () => {
       session: {
         idInstance: '1234567890',
         apiTokenInstance: 'api-token',
-        chatId: '79991234567@c.us',
+        chatId: '10000000',
         phoneNumber: '+7 999 123-45-67',
       },
     });
@@ -28,6 +29,7 @@ describe('MessageForm', () => {
 
   afterEach(() => {
     useSessionStore.setState({ session: null });
+    useMessageStore.setState({ messages: [] });
   });
 
   it('очищает поле после успешной отправки', async () => {
@@ -44,9 +46,16 @@ describe('MessageForm', () => {
       expect(mockedSendMessage).toHaveBeenCalledWith({
         idInstance: '1234567890',
         apiTokenInstance: 'api-token',
-        chatId: '79991234567@c.us',
+        chatId: '10000000',
         message: 'Привет!',
       });
+      expect(useMessageStore.getState().messages).toEqual([
+        {
+          id: 'message-id',
+          text: 'Привет!',
+          direction: 'outgoing',
+        },
+      ]);
       expect(messageField).toHaveValue('');
     });
   });

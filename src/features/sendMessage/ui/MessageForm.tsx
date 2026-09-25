@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
+import { useMessageStore } from '@entities/message/model/messageStore';
 import { useSessionStore } from '@entities/session/model/sessionStore';
 
 import { sendMessage } from '../api/sendMessage';
@@ -11,6 +12,7 @@ import { ErrorMessage, Field, Form, SubmitButton, Textarea } from './MessageForm
 const MessageForm = () => {
   const [hasRequestError, setHasRequestError] = useState(false);
   const session = useSessionStore((state) => state.session);
+  const addMessage = useMessageStore((state) => state.addMessage);
 
   const {
     register,
@@ -29,13 +31,18 @@ const MessageForm = () => {
     setHasRequestError(false);
 
     try {
-      await sendMessage({
+      const result = await sendMessage({
         idInstance: session.idInstance,
         apiTokenInstance: session.apiTokenInstance,
         chatId: session.chatId,
         message: values.message,
       });
 
+      addMessage({
+        id: result.idMessage,
+        text: values.message,
+        direction: 'outgoing',
+      });
       reset();
     } catch {
       setHasRequestError(true);

@@ -1,3 +1,4 @@
+import { MessageList } from '@entities/message/ui/MessageList';
 import { useSessionStore } from '@entities/session/model/sessionStore';
 import { MessageForm } from '@features/sendMessage/ui/MessageForm';
 
@@ -16,6 +17,7 @@ const ChatPage = () => {
         <Title>MAX Chat</Title>
         <PhoneNumber>{session.phoneNumber}</PhoneNumber>
         <ChatId>chatId: {session.chatId}</ChatId>
+        <MessageList />
         <MessageForm />
       </Card>
     </Page>
