@@ -29,11 +29,14 @@ const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredenti
       },
     });
 
-  const receiveNotification = () =>
-    request<ReceiveNotificationResponse>({
+  const receiveNotification = async (): Promise<ReceiveNotificationResponse | null> => {
+    const response = await request<ReceiveNotificationResponse | ''>({
       method: 'GET',
       url: `/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`,
     });
+
+    return response === '' ? null : response;
+  };
 
   const deleteNotification = (receiptId: number) =>
     request<DeleteNotificationResponse>({
