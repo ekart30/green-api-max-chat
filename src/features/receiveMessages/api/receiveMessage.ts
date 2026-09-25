@@ -7,15 +7,17 @@ type ReceiveMessageParams = {
   idInstance: string;
   apiTokenInstance: string;
   chatId: string;
+  signal?: AbortSignal;
 };
 
 const receiveMessage = async ({
   idInstance,
   apiTokenInstance,
   chatId,
+  signal,
 }: ReceiveMessageParams): Promise<Message | null> => {
   const client = createGreenApiClient({ idInstance, apiTokenInstance });
-  const notification = await client.receiveNotification();
+  const notification = await client.receiveNotification(signal);
 
   if (notification === null) {
     return null;

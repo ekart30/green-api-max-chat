@@ -1,15 +1,16 @@
+import type { Session } from '@entities/session/model/sessionStore';
 import { MessageList } from '@entities/message/ui/MessageList';
-import { useSessionStore } from '@entities/session/model/sessionStore';
+import { useReceiveMessages } from '@features/receiveMessages/model/useReceiveMessages';
 import { MessageForm } from '@features/sendMessage/ui/MessageForm';
 
 import { Card, ChatId, Page, PhoneNumber, Title } from './ChatPage.styles';
 
-const ChatPage = () => {
-  const session = useSessionStore((state) => state.session);
+type ChatPageProps = {
+  session: Session;
+};
 
-  if (session === null) {
-    return null;
-  }
+const ChatPage = ({ session }: ChatPageProps) => {
+  useReceiveMessages(session);
 
   return (
     <Page>
@@ -17,8 +18,9 @@ const ChatPage = () => {
         <Title>MAX Chat</Title>
         <PhoneNumber>{session.phoneNumber}</PhoneNumber>
         <ChatId>chatId: {session.chatId}</ChatId>
+
         <MessageList />
-        <MessageForm />
+        <MessageForm session={session} />
       </Card>
     </Page>
   );

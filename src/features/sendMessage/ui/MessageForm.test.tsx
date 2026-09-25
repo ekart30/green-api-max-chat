@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useMessageStore } from '@entities/message/model/messageStore';
-import { useSessionStore } from '@entities/session/model/sessionStore';
+import type { Session } from '@entities/session/model/sessionStore';
 
 import { sendMessage } from '../api/sendMessage';
 import { MessageForm } from './MessageForm';
@@ -14,33 +14,45 @@ vi.mock('../api/sendMessage', () => ({
 
 const mockedSendMessage = vi.mocked(sendMessage);
 
+const session: Session = {
+  idInstance: '1234567890',
+  apiTokenInstance: 'api-token',
+  chatId: '10000000',
+  phoneNumber: '+7 999 123-45-67',
+};
+
 describe('MessageForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    useSessionStore.setState({
-      session: {
-        idInstance: '1234567890',
-        apiTokenInstance: 'api-token',
-        chatId: '10000000',
-        phoneNumber: '+7 999 123-45-67',
-      },
+
+    useMessageStore.setState({
+      messages: [],
     });
   });
 
   afterEach(() => {
-    useSessionStore.setState({ session: null });
     useMessageStore.setState({ messages: [] });
   });
 
   it('очищает поле после успешной отправки', async () => {
     const user = userEvent.setup();
-    mockedSendMessage.mockResolvedValue({ idMessage: 'message-id' });
-    render(<MessageForm />);
 
-    const messageField = screen.getByRole('textbox', { name: 'Сообщение' });
+    mockedSendMessage.mockResolvedValue({
+      idMessage: 'message-id',
+    });
+
+    render(<MessageForm session={session} />);
+
+    const messageField = screen.getByRole('textbox', {
+      name: 'Сообщение',
+    });
 
     await user.type(messageField, 'Привет!');
-    await user.click(screen.getByRole('button', { name: 'Отправить' }));
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Отправить',
+      }),
+    );
 
     await waitFor(() => {
       expect(mockedSendMessage).toHaveBeenCalledWith({
@@ -49,6 +61,7 @@ describe('MessageForm', () => {
         chatId: '10000000',
         message: 'Привет!',
       });
+
       expect(useMessageStore.getState().messages).toEqual([
         {
           id: 'message-id',
@@ -56,18 +69,79 @@ describe('MessageForm', () => {
           direction: 'outgoing',
         },
       ]);
+
       expect(messageField).toHaveValue('');
     });
   });
 
   it('показывает ошибку при неудачной отправке', async () => {
     const user = userEvent.setup();
-    mockedSendMessage.mockRejectedValue(new Error('Request failed'));
-    render(<MessageForm />);
 
-    await user.type(screen.getByRole('textbox', { name: 'Сообщение' }), 'Привет!');
-    await user.click(screen.getByRole('button', { name: 'Отправить' }));
+    mockedSendMessage.mockRejectedValue(new Error('Request failed'));
+
+    render(<MessageForm session={session} />);
+
+    await user.type(
+      screen.getByRole('textbox', {
+        name: 'Сообщение',
+      }),
+      'Привет!',
+    );
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Отправить',
+      }),
+    );
 
     expect(await screen.findByText('Не удалось отправить сообщение')).toBeInTheDocument();
+  });
+
+  it('позволяет отправить несколько сообщений подряд', async () => {
+    const user = userEvent.setup();
+
+    mockedSendMessage
+      .mockResolvedValueOnce({
+        idMessage: 'message-1',
+      })
+      .mockResolvedValueOnce({
+        idMessage: 'message-2',
+      });
+
+    render(<MessageForm session={session} />);
+
+    const submitButton = screen.getByRole('button', {
+      name: 'Отправить',
+    });
+
+    const getMessageField = () =>
+      screen.getByRole('textbox', {
+        name: 'Сообщение',
+      });
+
+    await user.type(getMessageField(), 'Первое');
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(getMessageField()).toHaveValue('');
+      expect(submitButton).toBeEnabled();
+    });
+
+    await user.type(getMessageField(), 'Второе');
+
+    expect(getMessageField()).toHaveValue('Второе');
+
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(mockedSendMessage).toHaveBeenCalledTimes(2);
+    });
+
+    expect(mockedSendMessage).toHaveBeenLastCalledWith({
+      idInstance: '1234567890',
+      apiTokenInstance: 'api-token',
+      chatId: '10000000',
+      message: 'Второе',
+    });
   });
 });

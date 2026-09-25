@@ -3,31 +3,33 @@ import { useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
 import { useMessageStore } from '@entities/message/model/messageStore';
-import { useSessionStore } from '@entities/session/model/sessionStore';
+import { type Session } from '@entities/session/model/sessionStore';
 
 import { sendMessage } from '../api/sendMessage';
 import { sendMessageSchema, type SendMessageFormValues } from '../model/schema';
 import { ErrorMessage, Field, Form, SubmitButton, Textarea } from './MessageForm.styles';
 
-const MessageForm = () => {
+type MessageFormProps = {
+  session: Session;
+};
+
+const MessageForm = ({ session }: MessageFormProps) => {
   const [hasRequestError, setHasRequestError] = useState(false);
-  const session = useSessionStore((state) => state.session);
   const addMessage = useMessageStore((state) => state.addMessage);
 
   const {
     register,
     handleSubmit,
-    reset,
+    resetField,
     formState: { errors, isSubmitting },
   } = useForm<SendMessageFormValues>({
     resolver: zodResolver(sendMessageSchema),
+    defaultValues: {
+      message: '',
+    },
   });
 
   const onSubmit: SubmitHandler<SendMessageFormValues> = async (values) => {
-    if (session === null) {
-      return;
-    }
-
     setHasRequestError(false);
 
     try {
@@ -43,7 +45,7 @@ const MessageForm = () => {
         text: values.message,
         direction: 'outgoing',
       });
-      reset();
+      resetField('message');
     } catch {
       setHasRequestError(true);
     }

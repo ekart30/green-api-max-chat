@@ -8,7 +8,8 @@ import type {
 import { receiveMessage } from './receiveMessage';
 
 const clientMocks = vi.hoisted(() => {
-  const receiveNotification = vi.fn<() => Promise<ReceiveNotificationResponse | null>>();
+  const receiveNotification =
+    vi.fn<(signal?: AbortSignal) => Promise<ReceiveNotificationResponse | null>>();
   const deleteNotification = vi.fn<(receiptId: number) => Promise<DeleteNotificationResponse>>();
 
   return {

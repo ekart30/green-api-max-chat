@@ -9,6 +9,8 @@ import type {
   SendMessageResponse,
 } from './types';
 
+const RECEIVE_TIMEOUT_SECONDS = 60;
+
 const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredentials) => {
   const checkAccount = ({ phoneNumber }: CheckAccountRequest) =>
     request<CheckAccountResponse>({
@@ -29,10 +31,16 @@ const createGreenApiClient = ({ idInstance, apiTokenInstance }: GreenApiCredenti
       },
     });
 
-  const receiveNotification = async (): Promise<ReceiveNotificationResponse | null> => {
+  const receiveNotification = async (
+    signal?: AbortSignal,
+  ): Promise<ReceiveNotificationResponse | null> => {
     const response = await request<ReceiveNotificationResponse | ''>({
       method: 'GET',
       url: `/waInstance${idInstance}/receiveNotification/${apiTokenInstance}`,
+      params: {
+        receiveTimeout: RECEIVE_TIMEOUT_SECONDS,
+      },
+      signal,
     });
 
     return response === '' ? null : response;

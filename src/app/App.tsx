@@ -10,7 +10,7 @@ const App = () => {
   return (
     <>
       <GlobalStyle />
-      {session === null ? <ChatSetupPage /> : <ChatPage />}
+      {session === null ? <ChatSetupPage /> : <ChatPage session={session} />}
     </>
   );
 };
