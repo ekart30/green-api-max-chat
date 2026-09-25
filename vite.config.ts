@@ -8,6 +8,17 @@ export default defineConfig({
     react(),
     babel({
       presets: [reactCompilerPreset()],
+      plugins: [
+        [
+          'babel-plugin-styled-components',
+          {
+            displayName: true,
+            fileName: false,
+            minify: false,
+            pure: true,
+          },
+        ],
+      ],
     }),
   ],
   resolve: {

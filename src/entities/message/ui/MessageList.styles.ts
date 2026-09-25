@@ -10,28 +10,32 @@ type MessageBubbleProps = {
 const List = styled.ul`
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin: 32px 0 0;
-  padding: 24px 0 0;
-  border-top: 1px solid ${designTokens.colors.border};
+  gap: 8px;
+  width: 100%;
+  margin: auto 0 0;
+  padding: 0;
   list-style: none;
 `;
 
 const MessageBubble = styled.li<MessageBubbleProps>`
-  max-width: 75%;
+  max-width: min(72%, 560px);
   align-self: ${({ $direction }) => ($direction === 'outgoing' ? 'flex-end' : 'flex-start')};
-  padding: 10px 14px;
-  border: 1px solid
-    ${({ $direction }) =>
-      $direction === 'outgoing' ? designTokens.colors.primary : designTokens.colors.border};
-  border-radius: ${designTokens.borderRadius};
+  padding: 9px 13px;
+  border-radius: 16px;
   background: ${({ $direction }) =>
-    $direction === 'outgoing' ? designTokens.colors.primary : designTokens.colors.background};
+    $direction === 'outgoing'
+      ? designTokens.colors.outgoingMessage
+      : designTokens.colors.incomingMessage};
   color: ${({ $direction }) =>
-    $direction === 'outgoing' ? designTokens.colors.surface : designTokens.colors.text};
+    $direction === 'outgoing' ? designTokens.colors.accentText : designTokens.colors.text};
+  font-size: 15px;
   line-height: 1.5;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
+
+  @media (max-width: 560px) {
+    max-width: 86%;
+  }
 `;
 
 export { List, MessageBubble };

@@ -3,7 +3,19 @@ import { MessageList } from '@entities/message/ui/MessageList';
 import { useReceiveMessages } from '@features/receiveMessages/model/useReceiveMessages';
 import { MessageForm } from '@features/sendMessage/ui/MessageForm';
 
-import { Card, ChatId, Page, PhoneNumber, Title } from './ChatPage.styles';
+import {
+  Chat,
+  ChatBody,
+  ChatHeader,
+  ChatId,
+  ChatLayout,
+  MessagesArea,
+  Page,
+  PhoneNumber,
+  SelectedChat,
+  Sidebar,
+  SidebarTitle,
+} from './ChatPage.styles';
 
 type ChatPageProps = {
   session: Session;
@@ -14,14 +26,27 @@ const ChatPage = ({ session }: ChatPageProps) => {
 
   return (
     <Page>
-      <Card>
-        <Title>MAX Chat</Title>
-        <PhoneNumber>{session.phoneNumber}</PhoneNumber>
-        <ChatId>chatId: {session.chatId}</ChatId>
+      <ChatLayout>
+        <Sidebar>
+          <SidebarTitle>Чаты</SidebarTitle>
+          <SelectedChat>{session.phoneNumber}</SelectedChat>
+        </Sidebar>
 
-        <MessageList />
-        <MessageForm session={session} />
-      </Card>
+        <Chat>
+          <ChatHeader>
+            <PhoneNumber>{session.phoneNumber}</PhoneNumber>
+            <ChatId>chatId: {session.chatId}</ChatId>
+          </ChatHeader>
+
+          <ChatBody>
+            <MessagesArea>
+              <MessageList />
+            </MessagesArea>
+
+            <MessageForm session={session} />
+          </ChatBody>
+        </Chat>
+      </ChatLayout>
     </Page>
   );
 };

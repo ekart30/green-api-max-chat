@@ -2,65 +2,76 @@ import { designTokens } from '@app/styles/tokens';
 import styled from 'styled-components';
 
 const Form = styled.form`
-  display: grid;
-  gap: 12px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid ${designTokens.colors.border};
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  width: calc(100% - 48px);
+  max-width: 840px;
+  margin: 0 auto 16px;
+  padding: 6px 6px 6px 16px;
+  border: 0;
+  border-radius: 24px;
+  background: ${designTokens.colors.surface};
+  box-shadow: 0 8px 28px rgb(21 23 26 / 14%);
+
+  @media (max-width: 560px) {
+    width: calc(100% - 24px);
+    margin-bottom: 12px;
+    padding-left: 12px;
+  }
 `;
 
-const Field = styled.label`
-  display: grid;
-  gap: 8px;
-  color: ${designTokens.colors.text};
-  font-size: 14px;
-  font-weight: 600;
+const Field = styled.div`
+  flex: 1;
+  min-width: 0;
 `;
 
 const Textarea = styled.textarea`
+  display: block;
   width: 100%;
-  min-height: 120px;
-  padding: 12px 14px;
-  border: 1px solid ${designTokens.colors.border};
-  border-radius: ${designTokens.borderRadius};
+  height: 44px;
+  min-height: 44px;
+  max-height: 144px;
+  padding: 11px 4px;
+  border: 0;
   outline: none;
-  background: ${designTokens.colors.surface};
+  background: transparent;
   color: ${designTokens.colors.text};
   font-size: 15px;
-  line-height: 1.5;
-  resize: vertical;
-  transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease;
+  line-height: 22px;
+  overflow-y: hidden;
+  resize: none;
 
   &::placeholder {
     color: ${designTokens.colors.secondaryText};
-    opacity: 0.7;
-  }
-
-  &:focus {
-    border-color: ${designTokens.colors.primary};
-    box-shadow: 0 0 0 3px ${`${designTokens.colors.primary}1f`};
+    opacity: 1;
   }
 `;
 
 const ErrorMessage = styled.span`
+  flex-basis: 100%;
+  padding: 0 8px 4px;
   color: ${designTokens.colors.error};
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
 `;
 
 const SubmitButton = styled.button`
-  min-width: 120px;
+  display: grid;
+  flex-shrink: 0;
+  width: 44px;
   height: 44px;
-  justify-self: end;
-  padding: 0 20px;
+  place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: ${designTokens.borderRadius};
+  border-radius: 50%;
   background: ${designTokens.colors.primary};
-  color: ${designTokens.colors.surface};
-  font-weight: 700;
+  color: ${designTokens.colors.accentText};
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition:
     filter 160ms ease,

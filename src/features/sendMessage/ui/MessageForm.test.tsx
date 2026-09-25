@@ -43,14 +43,12 @@ describe('MessageForm', () => {
 
     render(<MessageForm session={session} />);
 
-    const messageField = screen.getByRole('textbox', {
-      name: 'Сообщение',
-    });
+    const messageField = screen.getByPlaceholderText('Сообщение');
 
     await user.type(messageField, 'Привет!');
     await user.click(
       screen.getByRole('button', {
-        name: 'Отправить',
+        name: '↑',
       }),
     );
 
@@ -81,16 +79,11 @@ describe('MessageForm', () => {
 
     render(<MessageForm session={session} />);
 
-    await user.type(
-      screen.getByRole('textbox', {
-        name: 'Сообщение',
-      }),
-      'Привет!',
-    );
+    await user.type(screen.getByPlaceholderText('Сообщение'), 'Привет!');
 
     await user.click(
       screen.getByRole('button', {
-        name: 'Отправить',
+        name: '↑',
       }),
     );
 
@@ -111,13 +104,10 @@ describe('MessageForm', () => {
     render(<MessageForm session={session} />);
 
     const submitButton = screen.getByRole('button', {
-      name: 'Отправить',
+      name: '↑',
     });
 
-    const getMessageField = () =>
-      screen.getByRole('textbox', {
-        name: 'Сообщение',
-      });
+    const getMessageField = () => screen.getByPlaceholderText('Сообщение');
 
     await user.type(getMessageField(), 'Первое');
     await user.click(submitButton);
@@ -143,5 +133,39 @@ describe('MessageForm', () => {
       chatId: '10000000',
       message: 'Второе',
     });
+  });
+
+  it('отправляет сообщение по Enter', async () => {
+    const user = userEvent.setup();
+
+    mockedSendMessage.mockResolvedValue({
+      idMessage: 'message-id',
+    });
+
+    render(<MessageForm session={session} />);
+
+    await user.type(screen.getByPlaceholderText('Сообщение'), 'Сообщение по Enter{Enter}');
+
+    await waitFor(() => {
+      expect(mockedSendMessage).toHaveBeenCalledWith({
+        idInstance: '1234567890',
+        apiTokenInstance: 'api-token',
+        chatId: '10000000',
+        message: 'Сообщение по Enter',
+      });
+    });
+  });
+
+  it('не отправляет сообщение по Shift+Enter и оставляет перенос строки', async () => {
+    const user = userEvent.setup();
+
+    render(<MessageForm session={session} />);
+
+    const messageField = screen.getByPlaceholderText('Сообщение');
+
+    await user.type(messageField, 'Первая строка{Shift>}{Enter}{/Shift}Вторая строка');
+
+    expect(mockedSendMessage).not.toHaveBeenCalled();
+    expect(messageField).toHaveValue('Первая строка\nВторая строка');
   });
 });

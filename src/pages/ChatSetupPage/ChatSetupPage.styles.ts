@@ -6,16 +6,16 @@ const Page = styled.main`
   min-height: 100vh;
   place-items: center;
   padding: 24px;
+  background: ${designTokens.colors.background};
 `;
 
 const Card = styled.section`
   width: 100%;
-  max-width: 440px;
-  padding: 40px;
-  border: 1px solid ${designTokens.colors.border};
+  max-width: 420px;
+  padding: 32px;
   border-radius: ${designTokens.borderRadius};
   background: ${designTokens.colors.surface};
-  box-shadow: 0 20px 50px rgb(23 33 30 / 8%);
+  box-shadow: ${designTokens.shadow};
 
   @media (max-width: 480px) {
     padding: 28px 24px;
@@ -23,13 +23,14 @@ const Card = styled.section`
 `;
 
 const Header = styled.header`
-  margin-bottom: 32px;
+  margin-bottom: 28px;
   text-align: center;
 `;
 
 const Title = styled.h1`
   margin: 0 0 12px;
-  font-size: 28px;
+  color: ${designTokens.colors.text};
+  font-size: 26px;
   line-height: 1.2;
   letter-spacing: -0.02em;
 `;
