@@ -61,15 +61,15 @@ const ErrorMessage = styled.span`
 const SubmitButton = styled.button`
   display: grid;
   flex-shrink: 0;
-  width: 44px;
+
   height: 44px;
   place-items: center;
-  padding: 0;
+  padding: 0 12px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 16px;
   background: ${designTokens.colors.primary};
   color: ${designTokens.colors.accentText};
-  font-size: 22px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1;
   cursor: pointer;

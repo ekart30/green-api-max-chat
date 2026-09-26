@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
+import { type Chat } from '@entities/chat/model/chatStore';
 import { useMessageStore } from '@entities/message/model/messageStore';
 import { type Session } from '@entities/session/model/sessionStore';
 
@@ -11,12 +12,13 @@ import { ErrorMessage, Field, Form, SubmitButton, Textarea } from './MessageForm
 
 type MessageFormProps = {
   session: Session;
+  activeChat: Chat;
 };
 
 const MIN_TEXTAREA_HEIGHT = 44;
 const MAX_TEXTAREA_HEIGHT = 144;
 
-const MessageForm = ({ session }: MessageFormProps) => {
+const MessageForm = ({ session, activeChat }: MessageFormProps) => {
   const [hasRequestError, setHasRequestError] = useState(false);
   const [textareaResetVersion, setTextareaResetVersion] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -77,7 +79,7 @@ const MessageForm = ({ session }: MessageFormProps) => {
       const result = await sendMessage({
         idInstance: session.idInstance,
         apiTokenInstance: session.apiTokenInstance,
-        chatId: session.chatId,
+        chatId: activeChat.chatId,
         message: values.message,
       });
 
@@ -122,7 +124,7 @@ const MessageForm = ({ session }: MessageFormProps) => {
       </Field>
 
       <SubmitButton type="submit" disabled={isSubmitting}>
-        ↑
+        Отправить
       </SubmitButton>
 
       {errors.message && <ErrorMessage>{errors.message.message}</ErrorMessage>}

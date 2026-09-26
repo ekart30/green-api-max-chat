@@ -3,8 +3,6 @@ import { create } from 'zustand';
 type Session = {
   idInstance: string;
   apiTokenInstance: string;
-  chatId: string;
-  phoneNumber: string;
 };
 
 type SessionStore = {

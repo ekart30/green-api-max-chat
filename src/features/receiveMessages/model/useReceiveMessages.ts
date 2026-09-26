@@ -1,14 +1,19 @@
 import { useEffect } from 'react';
 
+import { type Chat } from '@entities/chat/model/chatStore';
 import { useMessageStore } from '@entities/message/model/messageStore';
 import { type Session } from '@entities/session/model/sessionStore';
 
 import { receiveMessage } from '../api/receiveMessage';
 
-const useReceiveMessages = (session: Session) => {
+const useReceiveMessages = (session: Session, activeChat: Chat | null) => {
   const addMessage = useMessageStore((state) => state.addMessage);
 
   useEffect(() => {
+    if (activeChat === null) {
+      return;
+    }
+
     const controller = new AbortController();
     const { signal } = controller;
 
@@ -18,7 +23,7 @@ const useReceiveMessages = (session: Session) => {
           const message = await receiveMessage({
             idInstance: session.idInstance,
             apiTokenInstance: session.apiTokenInstance,
-            chatId: session.chatId,
+            chatId: activeChat.chatId,
             signal,
           });
 
@@ -38,7 +43,7 @@ const useReceiveMessages = (session: Session) => {
     return () => {
       controller.abort();
     };
-  }, [addMessage, session]);
+  }, [activeChat, addMessage, session]);
 };
 
 export { useReceiveMessages };

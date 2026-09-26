@@ -1,4 +1,4 @@
-import { ChatSetupForm } from '@features/createChat/ui/ChatSetupForm';
+import { SessionSetupForm } from '@features/setupSession/ui/SessionSetupForm';
 
 import { Card, Description, Header, Page, Title } from './ChatSetupPage.styles';
 
@@ -8,12 +8,10 @@ const ChatSetupPage = () => {
       <Card>
         <Header>
           <Title>GREEN-API MAX Chat</Title>
-          <Description>
-            Укажите данные инстанса и номер телефона, чтобы подключиться к чату.
-          </Description>
+          <Description>Укажите данные инстанса, чтобы подключиться к приложению.</Description>
         </Header>
 
-        <ChatSetupForm />
+        <SessionSetupForm />
       </Card>
     </Page>
   );

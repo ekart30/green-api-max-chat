@@ -1,6 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { Chat } from '@entities/chat/model/chatStore';
 import type { Message } from '@entities/message/model/messageStore';
 import { useMessageStore } from '@entities/message/model/messageStore';
 import type { Session } from '@entities/session/model/sessionStore';
@@ -19,6 +20,9 @@ const pendingReceiveMessage = () => new Promise<Message | null>(() => undefined)
 const session: Session = {
   idInstance: '1234567890',
   apiTokenInstance: 'api-token',
+};
+
+const activeChat: Chat = {
   chatId: '10000000',
   phoneNumber: '+7 999 123-45-67',
 };
@@ -36,6 +40,12 @@ describe('useReceiveMessages', () => {
     useMessageStore.setState({ messages: [] });
   });
 
+  it('не запускает polling без активного чата', () => {
+    renderHook(() => useReceiveMessages(session, null));
+
+    expect(mockedReceiveMessage).not.toHaveBeenCalled();
+  });
+
   it('добавляет полученное сообщение в messageStore', async () => {
     const message: Message = {
       id: 'incoming-message-id',
@@ -45,7 +55,7 @@ describe('useReceiveMessages', () => {
 
     mockedReceiveMessage.mockResolvedValueOnce(message).mockImplementation(pendingReceiveMessage);
 
-    const { unmount } = renderHook(() => useReceiveMessages(session));
+    const { unmount } = renderHook(() => useReceiveMessages(session, activeChat));
 
     await waitFor(() => {
       expect(useMessageStore.getState().messages).toEqual([message]);
@@ -57,7 +67,7 @@ describe('useReceiveMessages', () => {
   it('не добавляет сообщение при результате null', async () => {
     mockedReceiveMessage.mockResolvedValueOnce(null).mockImplementation(pendingReceiveMessage);
 
-    const { unmount } = renderHook(() => useReceiveMessages(session));
+    const { unmount } = renderHook(() => useReceiveMessages(session, activeChat));
 
     await waitFor(() => {
       expect(mockedReceiveMessage).toHaveBeenCalledTimes(2);
@@ -85,7 +95,7 @@ describe('useReceiveMessages', () => {
       });
     });
 
-    const { unmount } = renderHook(() => useReceiveMessages(session));
+    const { unmount } = renderHook(() => useReceiveMessages(session, activeChat));
 
     await waitFor(() => {
       expect(activeSignal).toBeDefined();

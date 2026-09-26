@@ -2,6 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { Chat } from '@entities/chat/model/chatStore';
 import { useMessageStore } from '@entities/message/model/messageStore';
 import type { Session } from '@entities/session/model/sessionStore';
 
@@ -17,6 +18,9 @@ const mockedSendMessage = vi.mocked(sendMessage);
 const session: Session = {
   idInstance: '1234567890',
   apiTokenInstance: 'api-token',
+};
+
+const activeChat: Chat = {
   chatId: '10000000',
   phoneNumber: '+7 999 123-45-67',
 };
@@ -41,7 +45,7 @@ describe('MessageForm', () => {
       idMessage: 'message-id',
     });
 
-    render(<MessageForm session={session} />);
+    render(<MessageForm session={session} activeChat={activeChat} />);
 
     const messageField = screen.getByPlaceholderText('Сообщение');
 
@@ -77,7 +81,7 @@ describe('MessageForm', () => {
 
     mockedSendMessage.mockRejectedValue(new Error('Request failed'));
 
-    render(<MessageForm session={session} />);
+    render(<MessageForm session={session} activeChat={activeChat} />);
 
     await user.type(screen.getByPlaceholderText('Сообщение'), 'Привет!');
 
@@ -101,7 +105,7 @@ describe('MessageForm', () => {
         idMessage: 'message-2',
       });
 
-    render(<MessageForm session={session} />);
+    render(<MessageForm session={session} activeChat={activeChat} />);
 
     const submitButton = screen.getByRole('button', {
       name: '↑',
@@ -142,7 +146,7 @@ describe('MessageForm', () => {
       idMessage: 'message-id',
     });
 
-    render(<MessageForm session={session} />);
+    render(<MessageForm session={session} activeChat={activeChat} />);
 
     await user.type(screen.getByPlaceholderText('Сообщение'), 'Сообщение по Enter{Enter}');
 
@@ -159,7 +163,7 @@ describe('MessageForm', () => {
   it('не отправляет сообщение по Shift+Enter и оставляет перенос строки', async () => {
     const user = userEvent.setup();
 
-    render(<MessageForm session={session} />);
+    render(<MessageForm session={session} activeChat={activeChat} />);
 
     const messageField = screen.getByPlaceholderText('Сообщение');
 

@@ -29,22 +29,59 @@ const ChatLayout = styled.div`
   }
 `;
 
-const Sidebar = styled.aside`
+const Sidebar = styled.aside<{ $hasActiveChat: boolean }>`
   min-width: 0;
   padding: 22px 12px;
   background: ${designTokens.colors.sidebar};
 
   @media (max-width: 760px) {
-    display: none;
+    display: ${({ $hasActiveChat }) => ($hasActiveChat ? 'none' : 'block')};
   }
 `;
 
-const SidebarTitle = styled.h1`
+const SidebarHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: 0 8px 24px;
+`;
+
+const SidebarTitle = styled.h1`
+  margin: 0;
   color: ${designTokens.colors.text};
   font-size: 26px;
   line-height: 1.2;
   letter-spacing: -0.03em;
+`;
+
+const AddChatButton = styled.button`
+  display: grid;
+  height: 34px;
+  place-items: center;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 50%;
+  background: ${designTokens.colors.primary};
+  color: ${designTokens.colors.accentText};
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    filter 160ms ease,
+    transform 160ms ease;
+
+  &:hover {
+    filter: brightness(0.94);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid ${designTokens.colors.focusRing};
+    outline-offset: 2px;
+  }
 `;
 
 const SelectedChat = styled.div`
@@ -59,19 +96,21 @@ const SelectedChat = styled.div`
   white-space: nowrap;
 `;
 
-const Chat = styled.section`
+const Chat = styled.section<{ $hasActiveChat: boolean }>`
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
   background: ${designTokens.colors.background};
+
+  @media (max-width: 760px) {
+    display: ${({ $hasActiveChat }) => ($hasActiveChat ? 'grid' : 'none')};
+  }
 `;
 
-const ChatBody = styled.div`
+const ChatBackground = styled.div`
   position: relative;
   isolation: isolate;
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
   overflow: hidden;
   background-image: linear-gradient(
@@ -103,6 +142,27 @@ const ChatBody = styled.div`
     opacity: 0.06;
     pointer-events: none;
   }
+`;
+
+const ChatBody = styled(ChatBackground)`
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+`;
+
+const EmptyChat = styled(ChatBackground)`
+  display: grid;
+  grid-row: 1 / -1;
+  place-items: center;
+  padding: 24px;
+`;
+
+const EmptyStateText = styled.p`
+  margin: 0;
+  color: ${designTokens.colors.text};
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
 `;
 
 const ChatHeader = styled.header`
@@ -143,15 +203,19 @@ const MessagesArea = styled.div`
 `;
 
 export {
+  AddChatButton,
   Chat,
   ChatBody,
   ChatHeader,
   ChatId,
   ChatLayout,
+  EmptyChat,
+  EmptyStateText,
   MessagesArea,
   Page,
   PhoneNumber,
   SelectedChat,
   Sidebar,
+  SidebarHeader,
   SidebarTitle,
 };
