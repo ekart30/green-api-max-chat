@@ -40,6 +40,21 @@ describe('CreateChatForm', () => {
     expect(mockedCreateChat).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['abc', 'Номер содержит недопустимые символы'],
+    ['123', 'Номер должен содержать 11 или 12 цифр'],
+  ])('не отправляет форму с невалидным номером %s', async (phoneNumber, expectedError) => {
+    const user = userEvent.setup();
+
+    render(<CreateChatForm session={session} />);
+
+    await user.type(screen.getByLabelText('Номер телефона'), phoneNumber);
+    await user.click(screen.getByRole('button', { name: 'Создать чат' }));
+
+    expect(await screen.findByText(expectedError)).toBeInTheDocument();
+    expect(mockedCreateChat).not.toHaveBeenCalled();
+  });
+
   it('передаёт credentials из session при проверке аккаунта', async () => {
     const user = userEvent.setup();
 

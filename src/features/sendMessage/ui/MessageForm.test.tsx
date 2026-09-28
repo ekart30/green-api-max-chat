@@ -52,7 +52,7 @@ describe('MessageForm', () => {
     await user.type(messageField, 'Привет!');
     await user.click(
       screen.getByRole('button', {
-        name: '↑',
+        name: 'Отправить',
       }),
     );
 
@@ -87,7 +87,7 @@ describe('MessageForm', () => {
 
     await user.click(
       screen.getByRole('button', {
-        name: '↑',
+        name: 'Отправить',
       }),
     );
 
@@ -108,7 +108,7 @@ describe('MessageForm', () => {
     render(<MessageForm session={session} activeChat={activeChat} />);
 
     const submitButton = screen.getByRole('button', {
-      name: '↑',
+      name: 'Отправить',
     });
 
     const getMessageField = () => screen.getByPlaceholderText('Сообщение');

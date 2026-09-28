@@ -1,6 +1,8 @@
 import { createGreenApiClient } from '@shared/api/greenApi/client';
 import type { CheckAccountResponse } from '@shared/api/greenApi/types';
 
+import { normalizePhoneNumber } from '../model/phoneNumber';
+
 type CreateChatParams = {
   idInstance: string;
   apiTokenInstance: string;
@@ -13,7 +15,7 @@ const createChat = async ({
   phoneNumber,
 }: CreateChatParams): Promise<CheckAccountResponse> => {
   const client = createGreenApiClient({ idInstance, apiTokenInstance });
-  const normalizedPhoneNumber = Number(phoneNumber.replace(/\D/g, ''));
+  const normalizedPhoneNumber = Number(normalizePhoneNumber(phoneNumber));
 
   return client.checkAccount({ phoneNumber: normalizedPhoneNumber });
 };
