@@ -1,76 +1,89 @@
-# React + TypeScript + Vite
+# GREEN-API MAX Chat
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Тестовый одностраничный чат-клиент для обмена текстовыми сообщениями в MAX через GREEN-API. Приложение поддерживает один активный чат и хранит состояние только во время текущей сессии.
 
-Currently, two official plugins are available:
+## Возможности
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- подключение по `idInstance` и `apiTokenInstance`;
+- проверка номера MAX через `CheckAccount` и создание одного активного чата;
+- отправка текстовых сообщений через `SendMessage`;
+- получение текстовых сообщений через последовательный long polling `ReceiveNotification`;
+- удаление обработанных уведомлений через `DeleteNotification`;
+- отправка по Enter и перенос строки по Shift+Enter;
+- интерфейс, визуально вдохновлённый web.max.ru.
 
-## React Compiler
+## Стек
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+React 19, TypeScript, Vite, Zustand, styled-components, React Hook Form, Zod, Axios, Vitest, React Testing Library, GREEN-API для MAX.
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+## Запуск
 
-## Expanding the ESLint configuration
+Установить зависимости:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Создать `.env` на основе `.env.example`:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+```env
+VITE_GREEN_API_URL=https://api.green-api.com/v3
 ```
+
+Запустить приложение:
+
+```bash
+npm run dev
+```
+
+`idInstance` и `apiTokenInstance` не нужно добавлять в `.env`: пользователь вводит их через интерфейс, после чего они хранятся только в runtime state приложения.
+
+## Настройка GREEN-API
+
+1. Создать MAX instance в GREEN-API.
+2. Авторизовать instance.
+3. Включить получение уведомлений о входящих сообщениях и файлах.
+4. Оставить пустым webhook URL для используемого HTTP API.
+
+## Как пользоваться
+
+1. Ввести `idInstance` и `apiTokenInstance`.
+2. Нажать «Продолжить».
+3. Нажать кнопку «+» в sidebar.
+4. Ввести номер пользователя MAX.
+5. Нажать «Создать чат».
+6. Отправлять текстовые сообщения.
+7. Ответы из MAX будут автоматически появляться в интерфейсе.
+
+## Архитектура
+
+Структура проекта вдохновлена feature-oriented/FSD-подходом:
+
+- `entities/session/model/sessionStore.ts` — credentials GREEN-API;
+- `entities/chat/model/chatStore.ts` — текущий `activeChat`;
+- `entities/message/model/messageStore.ts` — сообщения текущего чата;
+- `shared/api/greenApi` — HTTP-клиент и типы GREEN-API;
+- `features/createChat` — проверка номера и создание чата;
+- `features/sendMessage` — отправка текстовых сообщений;
+- `features/receiveMessages` — получение и обработка входящих сообщений;
+- `pages` — композиция экранов подключения и чата.
+
+## Long polling
+
+`ReceiveNotification` выполняется последовательно: следующий запрос начинается только после завершения предыдущего. `receiveTimeout` установлен в 60 секунд. Активный запрос отменяется через `AbortController` при cleanup, а после обработки полученного уведомления вызывается `DeleteNotification`.
+
+## Тесты
+
+```bash
+npm run test:run
+npm run build
+npm run lint
+```
+
+Тестами покрыты schemas, создание чата, последовательная отправка сообщений, Enter/Shift+Enter, обработка входящих сообщений и cleanup polling.
+
+## Ограничения
+
+- поддерживаются только текстовые сообщения;
+- поддерживается один активный чат;
+- история сообщений не сохраняется после перезагрузки страницы.
